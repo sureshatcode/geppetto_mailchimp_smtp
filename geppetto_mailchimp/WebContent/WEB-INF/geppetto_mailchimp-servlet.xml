@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:beans="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns="http://www.springframework.org/schema/mvc"
+	xmlns:p="http://www.springframework.org/schema/p" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/context
+		http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/mvc
+		http://www.springframework.org/schema/mvc/spring-mvc.xsd
+		http://www.springframework.org/schema/tx
+		http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+	<context:component-scan base-package="com.geppetto.mailchimp" />
+	<resources location="/resources/**" mapping="/" />
+	<default-servlet-handler />
+
+	<annotation-driven />
+	<context:annotation-config />
+	<tx:annotation-driven />
+	<tx:annotation-driven proxy-target-class="true" />
+
+	<context:property-placeholder location="/WEB-INF/resources/jdbc.properties"
+		order="1" ignore-unresolvable="true" />
+	<context:property-placeholder
+		location="/WEB-INF/resources/mail-config.properties" order="2"
+		ignore-unresolvable="true" />
+	<context:property-placeholder
+		location="/WEB-INF/resources/sql_properties/campaign_sql.properties"
+		order="3" ignore-unresolvable="true" />
+	<context:property-placeholder
+		location="/WEB-INF/resources/sql_properties/subscriber_sql.properties"
+		order="4" ignore-unresolvable="true" />
+	<context:property-placeholder
+		location="/WEB-INF/resources/sql_properties/template_sql.properties"
+		order="5" ignore-unresolvable="true" />
+
+	<beans:bean id="dataSource" class="org.apache.commons.dbcp2.BasicDataSource">
+		<beans:property name="driverClassName">
+			<beans:value>${jdbc.drivername}</beans:value>
+		</beans:property>
+		<beans:property name="url">
+			<beans:value>${jdbc.url}</beans:value>
+		</beans:property>
+		<beans:property name="username">
+			<beans:value>${jdbc.username}</beans:value>
+		</beans:property>
+		<beans:property name="password">
+			<beans:value>${jdbc.password}</beans:value>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="entityManagerFactory"
+		class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+		<beans:property name="dataSource" ref="dataSource" />
+		<beans:property name="packagesToScan" value="com.geppetto.mailchimp.dto" />
+		<beans:property name="jpaVendorAdapter">
+			<beans:bean
+				class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter" />
+		</beans:property>
+		<beans:property name="jpaProperties">
+			<beans:props>
+				<beans:prop key="hibernate.hbm2ddl.auto">update</beans:prop>
+				<beans:prop key="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect
+				</beans:prop>
+			</beans:props>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="transactionManager"
+		class="org.springframework.orm.jpa.JpaTransactionManager">
+		<beans:property name="entityManagerFactory" ref="entityManagerFactory" />
+	</beans:bean>
+
+	<beans:bean id="persistenceExceptionTranslationPostProcessor"
+		class="org.springframework.dao.annotation.PersistenceExceptionTranslationPostProcessor" />
+
+	<beans:bean
+		class="org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter">
+		<beans:property name="messageConverters">
+			<beans:list>
+				<beans:ref bean="jsonMessageConverter" />
+			</beans:list>
+		</beans:property>
+	</beans:bean>
+
+	<beans:bean id="jsonMessageConverter"
+		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter">
+	</beans:bean>
+
+	<beans:bean id="mailSender"
+		class="org.springframework.mail.javamail.JavaMailSenderImpl">
+		<beans:property name="port" value="${mail.port}"></beans:property>
+		<beans:property name="host" value="${mail.host}"></beans:property>
+		<beans:property name="username" value="${mail.username}"></beans:property>
+		<beans:property name="password" value="${mail.password}"></beans:property>
+		<beans:property name="javaMailProperties">
+			<beans:props>
+				<beans:prop key="mail.smtp.auth">${mail.smtp.auth}</beans:prop>
+				<beans:prop key="mail.smtp.starttls.enable">${mail.smtp.starttls}</beans:prop>
+			</beans:props>
+		</beans:property>
+	</beans:bean>
+
+</beans:beans>
