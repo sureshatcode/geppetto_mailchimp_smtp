@@ -37,22 +37,6 @@
 							is required!</span></span>
 				</div>
 				<div class="item">
-					<label for="campaigntype">Type</label> <select style="width: 100%;"
-						id="campaigntype" ng-model="campaign.campaignType"
-						class="form-control" name="campaigntype" required="required">
-						<option value="" selected="selected">Select the Type</option>
-						<option value="regular">Regular</option>
-						<!-- <option value="plaintext">Plain Text</option>
-					<option value="absplit">Absplit</option>
-					<option value="rss">RSS</option>
-					<option value="auto">Auto</option> -->
-					</select><span
-						ng-show="campaignForm.campaigntype.$dirty && campaignForm.campaigntype.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.campaigntype.$error.required">Type is
-							required!</span></span>
-				</div>
-				<div class="item">
 					<label for="emailsubject">Email Subject</label> <input
 						style="width: 100%;" type="text" class="form-control"
 						id="emailsubject" name="emailsubject"
@@ -62,61 +46,6 @@
 						style="color: red;"><span
 						ng-show="campaignForm.emailsubject.$error.required">Email
 							subject is required!</span></span>
-				</div>
-				<div class="item">
-					<label for="fromname">From Name</label> <input style="width: 100%;"
-						type="text" class="form-control" id="fromname" name="fromname"
-						placeholder="Enter the from name" ng-model="campaign.fromName"
-						required="required"><span
-						ng-show="campaignForm.fromname.$dirty && campaignForm.fromname.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.fromname.$error.required">From name
-							is required!</span></span>
-				</div>
-				<div class="item">
-					<label for="fromemail">From Email</label> <input
-						style="width: 100%;" type="text" class="form-control"
-						id="fromemail" name="fromemail" placeholder="Enter the from email"
-						ng-model="campaign.fromEmail"
-						data-ng-pattern="/^[_a-z0-9]+(\.[_a-z0-9]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$/"
-						required="required"><span
-						ng-show="campaignForm.fromemail.$dirty && campaignForm.fromemail.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.fromemail.$error.required">From email
-							is required!</span><span ng-show="campaignForm.fromemail.$error.pattern">Invalid
-							email!</span></span>
-				</div>
-				<div class="item" style="display: none;">
-					<label for="toname">To Name Type</label> <select
-						style="width: 100%;" id="toname" ng-model="campaign.toNameType"
-						name="toname" class="form-control" required="required">
-						<option value="" selected="selected">Select the To Name
-							Type</option>
-						<option value="*|FNAME|*">First name</option>
-						<option value="*|LNAME|*">Last name</option>
-						<option value="*|FNAME|* *|LNAME|*">First name | Last
-							name</option>
-						<option value="*|LNAME|* *|FNAME|*">Last name | First
-							name</option>
-					</select><span
-						ng-show="campaignForm.toname.$dirty && campaignForm.toname.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.toname.$error.required">To name
-							pattern is required!</span></span>
-				</div>
-				<div class="item">
-					<label for="emailtype">Email Type</label> <select
-						style="width: 100%;" id="emailtype" ng-model="campaign.emailType"
-						class="form-control" name="emailtype" required="required">
-						<option value="" selected="selected">Select the Email
-							Type</option>
-						<option value="html">HTML</option>
-						<option value="text">Text</option>
-					</select><span
-						ng-show="campaignForm.emailtype.$dirty && campaignForm.emailtype.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.emailtype.$error.required">Email type
-							is required!</span></span>
 				</div>
 				<div class="item">
 					<label for="newtemplate">New Email Template</label> <select
@@ -152,28 +81,6 @@
 						style="color: red;"><span
 						ng-show="campaignForm.templatename.$error.required">Template
 							name is required!</span></span>
-				</div>
-				<div class="item" style="display: none;">
-					<label for="apikey">API Key</label> <input style="width: 100%;"
-						type="text" class="form-control" id="apikey" name="apikey"
-						placeholder="Enter the API key" ng-model="campaign.apiKey"
-						ng-disabled="campaign.campaignId != '' || campaign.emailStatus"
-						required="required"><span
-						ng-show="campaignForm.apikey.$dirty && campaignForm.apikey.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.apikey.$error.required">API Key is
-							required!</span></span>
-				</div>
-				<div class="item" style="display: none;">
-					<label for="list">List ID</label> <input style="width: 100%;"
-						type="text" class="form-control" id="listId" name="listId"
-						placeholder="Enter the list ID" ng-model="campaign.listId"
-						ng-disabled="campaign.campaignId != '' || campaign.emailStatus"
-						required="required"><span
-						ng-show="campaignForm.listId.$dirty && campaignForm.listId.$error"
-						style="color: red;"><span
-						ng-show="campaignForm.listId.$error.required">List ID is
-							required!</span></span>
 				</div>
 			</div>
 			<hr>
@@ -225,35 +132,30 @@
 					ng-show="campaignForm.bodycontent.$error.required">Body
 						Content is required!</span></span>
 			</div>
-			</accordion-group> <accordion-group heading="List of Subscribers"
-				ng-hide="campaign.campaignSno == ''" class="architecture">
+			</accordion-group> <accordion-group heading="List of Subscribers" class="architecture">
 			<div class="properties">
 				<h3 class="title lead">List of Subscribers</h3>
-				<div ui-grid="gridOptions" ui-grid-pagination ui-grid-resize-columns
-					class="table"></div>
+				<div ui-grid="gridOptions" ui-grid-edit ui-grid-pagination
+					ui-grid-resize-columns class="table"></div>
 			</div>
+			<button class="btn btn-success" ng-click="addNewRow()">Add
+				New Row</button>
+			<button class="btn btn-info"
+				ng-disabled="subscribersList.length == 0 || subscribersList.length > 5"
+				ng-click="createSubscribers()">Create Subscribers</button>
 			</accordion-group></accordion>
 		</div>
 		<hr>
 		<div class="action">
-			<!-- <button class="btn btn-info" ng-show="CampaignBtn" id="subscribeBtn"
-				ng-disabled="pickedSubscribers == '' || campaignForm.listId.$pristine || campaignForm.apikey.$pristine 
-				|| campaignForm.listId.$dirty && campaignForm.listId.$invalid 
-				|| campaignForm.apikey.$dirty && campaignForm.apikey.$invalid"
-				ng-click="subscribeTheList()">Subscribe</button> -->
 			<button ng-show="CampaignBtn" class="btn btn-info"
 				ng-click="createCampaign()"
 				ng-disabled="campaign.campaignSno != '' || campaignForm.title.$pristine || campaignForm.label.$pristine || 
-			campaignForm.description.$pristine || campaignForm.emailsubject.$pristine || campaignForm.fromname.$pristine ||
-			campaignForm.fromemail.$pristine || campaignForm.campaigntype.$pristine || campaignForm.emailtype.$pristine || 
-			campaignForm.templatename.$pristine || campaignForm.bodyheader.$pristine || campaignForm.bodyheadersub.$pristine ||
-			campaignForm.bodyfooter.$pristine || campaignForm.bodycontent.$pristine || campaignForm.title.$dirty && 
-			campaignForm.title.$invalid || campaignForm.label.$dirty && campaignForm.label.$invalid || 
-			campaignForm.description.$dirty && campaignForm.description.$invalid || campaignForm.emailsubject.$dirty &&
-			campaignForm.emailsubject.$invalid || campaignForm.fromname.$dirty && campaignForm.fromname.$invalid ||
-			campaignForm.fromemail.$dirty && campaignForm.fromemail.$invalid || campaignForm.campaigntype.$dirty &&
-			campaignForm.campaigntype.$invalid || campaignForm.emailtype.$dirty && campaignForm.emailtype.$invalid || 
-			campaignForm.templatename.$dirty && campaignForm.templatename.$invalid || campaignForm.bodyheader.$invalid && 
+			campaignForm.description.$pristine || campaignForm.emailsubject.$pristine || campaignForm.templatename.$pristine || 
+			campaignForm.bodyheader.$pristine || campaignForm.bodyheadersub.$pristine || campaignForm.bodyfooter.$pristine || 
+			campaignForm.bodycontent.$pristine || campaignForm.title.$dirty && campaignForm.title.$invalid || 
+			campaignForm.label.$dirty && campaignForm.label.$invalid || campaignForm.description.$dirty &&
+			campaignForm.description.$invalid || campaignForm.emailsubject.$dirty && campaignForm.emailsubject.$invalid || 
+			campaignForm.templatename.$dirty && campaignForm.templatename.$invalid || campaignForm.bodyheader.$invalid &&
 			campaignForm.bodyheader.$dirty || campaignForm.bodyheadersub.$invalid && campaignForm.bodyheadersub.$dirty || 
 			campaignForm.bodyfooter.$invalid && campaignForm.bodyfooter.$dirty || campaignForm.bodycontent.$invalid && 
 			campaignForm.bodycontent.$dirty">Create

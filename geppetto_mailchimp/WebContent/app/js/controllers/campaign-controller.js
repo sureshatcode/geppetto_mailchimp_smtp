@@ -65,6 +65,8 @@ app.controller("CampaignController", [
 			$scope.testEmailIds = [];
 			$scope.gridOptions = {};
 			
+			$scope.emailRegex = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			
 			$scope.openAlertDialog = function(size, msg) {
 				var modalInstance = $modal.open({
 					animation : true,
@@ -97,6 +99,11 @@ app.controller("CampaignController", [
 				});
 			};
 			
+			$scope.actionButtons='<div><button class="btn btn-success btn-sm" ng-disabled="row.entity.subscriberSno == 0"' + 
+			' ng-click="grid.appScope.updateSubscriber(row.entity)" style="margin:2px;"><i class="fa fa-check"></i></button>' + 
+			'<button class="btn btn-danger btn-sm" ng-click="grid.appScope.deleteSubscriber(row.entity.subscriberSno)"' + 
+			' ng-disabled="row.entity.subscriberSno == 0" style="margin:2px;"><i class="fa fa-trash"></i></button></div>';
+			
 			$scope.initializeGrid = function() {
 				$scope.gridOptions = {
 					data : $scope.subscribersList,
@@ -105,8 +112,6 @@ app.controller("CampaignController", [
 					enableCellEditOnFocus : true,
 					enableColumnResizing : true,
 					enableHorizontalScrollbar : 0,
-					paginationPageSizes: [5, 10, 25],
-				    paginationPageSize: 5,
 					columnDefs : [
 							{
 								field : 'checkbox',
@@ -119,22 +124,48 @@ app.controller("CampaignController", [
 								enableHiding : false,
 								enableColumnMenu : false,
 								cellTemplate : '<label class="form-checkbox" style="padding: 8px;">'
-										+ '<input type="checkbox" id="checkbox" ng-click="grid.appScope.pickSubscribers(row.entity)">'
-										+ '<span></span></label>'
+										+ '<input type="checkbox" id="checkbox" ng-disabled="row.entity.subscriberSno == 0"'
+										+ ' ng-click="grid.appScope.pickSubscribers(row.entity)"><span></span></label>'
+							}, {
+								field : 'subscriberSno',
+								name : 'S. No.',
+								enableCellEdit : false,
+								width : '75',
 							}, {
 								field : 'firstName',
 								name : 'First Name',
-								width : '250',
+								width : '187',
 							}, {
 								field : 'lastName',
 								name : 'Last Name',
-								width : '250',
+								width : '187',
 							}, {
 								field : 'emailAddress',
 								name : 'Email Address',
-								width : '420',
+								width : '383',
+							}, {
+								field : 'action',
+								name :'Action',
+								width : '100',
+								enableCellEdit : false,
+								cellTemplate : $scope.actionButtons
 							} ]
 				};
+			};
+			
+			$scope.addNewRow = function() {
+				if ($scope.subscribersList.length < 5) {
+					$scope.subscriber = {
+						subscriberSno: 0,
+						firstName: "Enter the first name",
+						lastName: "Enter the last name",
+						emailAddress: "Enter the email address",
+						action: $scope.actionButtons,
+					}
+					$scope.subscribersList.push($scope.subscriber);
+				} else {
+					$scope.openAlertDialog('sm', 'Max. limit was reached!');
+				}
 			};
 			
 			$scope.pickNewTemplate = function(value) {
@@ -176,10 +207,6 @@ app.controller("CampaignController", [
 			$scope.addNewCampaign = function() {
 				$scope.campaign.emailTemplate = "";
 				$location.url('/en-US/campaign/create');
-			};
-			
-			$scope.gotoSendEmail = function() {
-				$location.url('/en-US/sendemail/send');
 			};
 
 			$scope.editExistingCampaign = function(id) {
@@ -235,7 +262,7 @@ app.controller("CampaignController", [
 				});
 			};
 			
-			$scope.pickSubscribers = function(data) {				
+			$scope.pickSubscribers = function(data) {
 				if ($scope.pickedSubscribers.length > 0) {
 					var remCount = 0;
 					for ( var subs in $scope.pickedSubscribers) {
@@ -245,26 +272,78 @@ app.controller("CampaignController", [
 						}
 					}
 					if (remCount <= 0) {
-						if ($scope.pickedSubscribers.length <= 4) {
+						if ($scope.pickedSubscribers.length <= 4 && data.subscriberSno != 0) {
 							$scope.pickedSubscribers.push(data);
 						} else {
-							$scope.openAlertDialog('sm', 'Max. limit was reached!');							
+							$scope.openAlertDialog('sm', 'Max. limit was reached!');
 						}
 					}
 				} else {
-					$scope.pickedSubscribers.push(data);
+					if (data.subscriberSno != 0) {
+						$scope.pickedSubscribers.push(data);
+					}
 				}
 			};
 			
-			$scope.subscribeTheList = function() {
-				var url = RestURL.baseURL + '/mailchimpapi/subscribeTheList';
+			$scope.createSubscribers = function() {
+				$scope.subscribersInfoList = [];
+				var lenCheck = 0;
+				for ( var index in $scope.subscribersList) {
+					$scope.subscriberInfo = {
+						subscriberSno : "",
+						firstName : "",
+						lastName : "",
+						emailAddress : ""
+					}
+					if ($scope.subscribersList[index].subscriberSno == 0) {
+						lenCheck += 1;
+					}
+					$scope.subscriberInfo.subscriberSno = $scope.subscribersList[index].subscriberSno;
+					$scope.subscriberInfo.firstName = $scope.subscribersList[index].firstName;
+					$scope.subscriberInfo.lastName = $scope.subscribersList[index].lastName;
+					$scope.subscriberInfo.emailAddress = $scope.subscribersList[index].emailAddress;
+					$scope.subscribersInfoList.push($scope.subscriberInfo);
+				}
+				if (lenCheck > 0) {
+					var url = RestURL.baseURL + '/subscriber/createSubscribers';
+					$http({
+						method : "POST",
+						url : url,
+						data : $scope.subscribersInfoList,
+						headers : {
+							"content-type" : "application/json",
+							"Accept" : "application/json"
+						},
+					}).success(function(response) {
+		 				if (response != null) {
+							if (response.length != 0) {
+								var msg = "Subscribers was created successfully!";
+								$scope.subscribersList = response;
+								$scope.initializeGrid();
+							} else {
+								var msg = "Subscribers creation was failed, due to some internal errors!";
+							}
+							$scope.openAlertDialog('sm', msg);
+						}
+					}).error(function(response) {
+						$log.debug("Request Error: ", response);
+					});
+				} else {
+					var msg = "There is no new subscribers to create!";
+					$scope.openAlertDialog('sm', msg);
+				}
+			};
+			
+			$scope.updateSubscriber = function(data) {
+				var url = RestURL.baseURL + '/subscriber/updateSubscriber';
 				$http({
 					method : "POST",
 					url : url,
 					data : {
-						apiKey : $scope.campaign.apiKey,
-						listId : $scope.campaign.listId,
-						subscribers : $scope.pickedSubscribers,
+						subscriberSno: data.subscriberSno,
+						firstName: data.firstName,
+						lastName: data.lastName,
+						emailAddress: data.emailAddress,
 					},
 					headers : {
 						"content-type" : "application/json",
@@ -272,13 +351,35 @@ app.controller("CampaignController", [
 					},
 				}).success(function(response) {
 					if (response != null) {
-						if (response.error_count == 0) {
-							var msg = "Subscribers subscribed successfully!"
-						} else {
-							var msg = "Subscribers subscription failed, due to some internal errors!"
-						}
-						$scope.openAlertDialog('sm', msg);
+						var msg = "Subscribers was updated successfully!";
+						$scope.initializeGrid();
+					} else {
+						var msg = "Subscribers updation was failed, due to some internal errors!";
 					}
+					$scope.openAlertDialog('sm', msg);
+				}).error(function(response) {
+					$log.debug("Request Error: ", response);
+				});
+			};
+			
+			$scope.deleteSubscriber = function(id) {
+				var url = RestURL.baseURL + '/subscriber/deleteSubscriber?subscriberSno=' + id;
+				$http({
+					method : "GET",
+					url : url,
+				}).success(function(response) {
+					if (response) {
+						for ( var subscriberInfo in $scope.subscribersList) {
+							if ($scope.subscribersList[subscriberInfo]['subscriberSno'] == id) {
+								var msg = "Subscriber was deleted successfully!";
+								$scope.subscribersList.splice(subscriberInfo, 1);
+								$scope.initializeGrid();
+							}
+						}
+					} else {
+						var msg = "Subscriber deletion was failed, due to some internal errors!";
+					}
+					$scope.openAlertDialog('sm', msg);
 				}).error(function(response) {
 					$log.debug("Request Error: ", response);
 				});
@@ -298,13 +399,13 @@ app.controller("CampaignController", [
 				}).success(function(response) {
 					if (response != null) {
 						if (response.campaignId != null) {
-							$scope.campaign = response;							
+							$scope.campaign = response;
 							$scope.templatesList.push(response.emailTemplate.templateName);
 							$scope.template.templateSno = response.emailTemplate.templateSno;
 							$scope.template = response.emailTemplate;
-							var msg = "Campaign was created successfully!"
+							var msg = "Campaign was created successfully!";
 						} else {
-							var msg = "Campaign creation was failed, due to some internal errors!"
+							var msg = "Campaign creation was failed, due to some internal errors!";
 						}
 						$scope.openAlertDialog('sm', msg);
 					}
@@ -328,9 +429,9 @@ app.controller("CampaignController", [
 					if (response != null) {
 						$scope.campaign = response;
 						$scope.template = response.emailTemplate;
-						var msg = "Campaign was updated successfully!"
+						var msg = "Campaign was updated successfully!";
 					} else {
-						var msg = "Campaign updation failed, due to some internal errors!"
+						var msg = "Campaign updation was failed, due to some internal errors!";
 					}
 					$scope.openAlertDialog('sm', msg);
 				}).error(function(response) {
@@ -352,7 +453,7 @@ app.controller("CampaignController", [
 									$scope.campaignsList.splice(campaign, 1);
 								}, 100);
 							} else {
-								var msg = "Campaign deletion failed, due to some internal errors!";
+								var msg = "Campaign deletion was failed, due to some internal errors!";
 							}
 						}
 						$scope.openAlertDialog('sm', msg);
@@ -379,95 +480,60 @@ app.controller("CampaignController", [
 				modalInstance.result.then(function(dataFromModal) {
 					$scope.subscriberEmails.push(dataFromModal.email);
 					$scope.sendSMTPEmail();
-					// $scope.testEmailIds = dataFromModal.email.split(","); // Enable this, If you want to send a test email multiple users
-					/*$scope.testEmailIds.push(dataFromModal.email);
-					if ($scope.testEmailIds != "") {
-						var url = RestURL.baseURL + '/mailchimpapi/sendTestEmail?api_key='
-							+ $scope.campaign.apiKey + "&campaign_id=" + $scope.campaign.campaignId + "&emailIds="
-							+ $scope.testEmailIds;
-						$http({
-							method : "GET",
-							url : url,
-						}).success(function(response) {
-							if (response != null) {
-								if (response) {
-									var msg = "Test email was sent successfully!"
-								} else {
-									var msg = "Test email was not sent, due to some internal errors!"
-								}
-								$scope.openAlertDialog('sm', msg);
-							}
-						}).error(function(response) {
-							$log.debug("Request Error: ", response);
-						});
-					}*/
-				});
-			};
-			
-			$scope.sendCampaign = function() {
-				var url = RestURL.baseURL + '/mailchimpapi/sendCampaign?api_key='
-						+ $scope.campaign.apiKey + "&campaign_id="
-						+ $scope.campaign.campaignId + "&campaign_sno="
-						+ $scope.campaign.campaignSno;
-				$http({
-					method : "GET",
-					url : url,
-				}).success(function(response) {
-					if (response != null) {
-						if (response) {
-							var msg = "Campaign was sent successfully!"
-								$scope.campaign.emailStatus = response;
-						} else {
-							var msg = "Campaign sending was failed, due to some internal errors!"
-						}
-						$scope.openAlertDialog('sm', msg);
-					}
-				}).error(function(response) {
-					$log.debug("Request Error: ", response);
 				});
 			};
 			
 			$scope.sendSMTPEmail = function() {
+				var validEmail = 0;
 				if ($scope.subscriberEmails == "" || $scope.subscriberEmails == null) {
 					if ($scope.pickedSubscribers != null) {
 						for ( var subs in $scope.pickedSubscribers) {
-							$scope.subscriberEmails.push($scope.pickedSubscribers[subs].emailAddress);
+							if ($scope.emailRegex.test($scope.pickedSubscribers[subs].emailAddress)) {
+								$scope.subscriberEmails.push($scope.pickedSubscribers[subs].emailAddress);
+							} else {
+								validEmail += 1;
+							}
 						}
 					}
-				}				
-				var url = RestURL.baseURL + '/email/sendSMTPEmail';
-				$http({
-					method : "POST",
-					url : url,
-					data : {
-						receipiants : $scope.subscriberEmails,
-						fromName : $scope.campaign.fromName,
-						fromEmail : $scope.campaign.fromEmail,
-						emailSubject : $scope.campaign.emailSubject,
-						baseTemplateId : $scope.template.baseTemplateId,
-						templateSno : $scope.template.templateSno,
-						bodyHeader : $scope.template.bodyHeader,
-						bodySubject : $scope.template.bodySubject,
-						bodyFooter : $scope.template.bodyFooter,
-						bodyContent : $scope.template.bodyContent
-					},
-					headers : {
-						"content-type" : "application/json",
-						"Accept" : "application/json"
-					},
-				}).success(function(response) {
-					if (response != null) {
-						if (response) {
-							var msg = "Email was sent successfully!"
-							$scope.subscriberEmails = [];
-						} else {
-							var msg = "Email sending was failed, due to some internal errors!"
+				}
+				if (validEmail == 0) {
+					var url = RestURL.baseURL + '/email/sendSMTPEmail';
+					$http({
+						method : "POST",
+						url : url,
+						data : {
+							receipiants : $scope.subscriberEmails,
+							fromName : $scope.campaign.fromName,
+							fromEmail : $scope.campaign.fromEmail,
+							emailSubject : $scope.campaign.emailSubject,
+							baseTemplateId : $scope.template.baseTemplateId,
+							templateSno : $scope.template.templateSno,
+							bodyHeader : $scope.template.bodyHeader,
+							bodySubject : $scope.template.bodySubject,
+							bodyFooter : $scope.template.bodyFooter,
+							bodyContent : $scope.template.bodyContent
+						},
+						headers : {
+							"content-type" : "application/json",
+							"Accept" : "application/json"
+						},
+					}).success(function(response) {
+						if (response != null) {
+							if (response) {
+								var msg = "Email was sent successfully!";
+								$scope.subscriberEmails = [];
+							} else {
+								var msg = "Email sending was failed, due to some internal errors!";
+							}
+							$scope.openAlertDialog('sm', msg);
 						}
-						$scope.openAlertDialog('sm', msg);
-					}
-				}).error(function(response) {
-					$log.debug("Request Error: ", response);
-				});
+					}).error(function(response) {
+						$log.debug("Request Error: ", response);
+					});
+				} else {
+					var msg = "Please provide the valid email address!";
+					$scope.openAlertDialog('sm', msg);
+				}
 			};
 			
 			$scope.goBack = function() {
@@ -523,15 +589,9 @@ app.controller("CampaignController", [
 				
 				$timeout(function() {
 					$scope.template.templateSno = CampaignData.campaign.emailTemplate.templateSno;
-					$scope.template.baseTemplateId = CampaignData.campaign.emailTemplate.baseTemplateId;					
+					$scope.template.baseTemplateId = CampaignData.campaign.emailTemplate.baseTemplateId;
 				}, 1000);
-				
 				break;
-			/*case 'send':
-				$scope.CampaignBtn = true;
-				$scope.findAllTemplates();
-				$scope.findAllSubscribers();
-				break;*/
 			default:
 				$location.url('/en-US/campaigns');
 			};

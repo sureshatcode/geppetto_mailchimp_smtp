@@ -1,6 +1,7 @@
 package com.geppetto.mailchimp.serviceimpl;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,9 +50,18 @@ public class SubscriberServiceImpl implements SubscriberService {
 
 	@Override
 	@Transactional
-	public Subscriber createSubscriber(Subscriber subscriber) throws Exception {
+	public List<Subscriber> createSubscribers(List<Subscriber> subscribers) throws Exception {
 		LOG.debug("Create subscriber method has been initialized in the service layer!");
-		return this.subscriberDao.createSubscriber(subscriber);
+
+		List<Subscriber> subscribersList = new ArrayList<Subscriber>();
+		for (Subscriber subscriber : subscribers) {
+			if (subscriber.getSubscriberSno() == 0L) {
+				subscribersList.add(this.subscriberDao.createSubscriber(subscriber));
+			} else {
+				subscribersList.add(subscriber);
+			}
+		}
+		return subscribersList;
 	}
 
 	@Override

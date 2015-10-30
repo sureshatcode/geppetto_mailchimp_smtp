@@ -1,6 +1,7 @@
 package com.geppetto.mailchimp.service;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.geppetto.mailchimp.dto.Subscriber;
 
@@ -18,7 +19,7 @@ public interface SubscriberService {
 
 	public Subscriber findSubscriber(long subscriberSno) throws Exception;
 
-	public Subscriber createSubscriber(Subscriber subscriber) throws Exception;
+	public List<Subscriber> createSubscribers(List<Subscriber> subscribers) throws Exception;
 
 	public Subscriber updateSubscriber(Subscriber subscriber) throws Exception;
 

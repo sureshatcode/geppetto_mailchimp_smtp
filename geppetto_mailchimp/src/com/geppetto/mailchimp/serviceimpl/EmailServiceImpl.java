@@ -68,7 +68,7 @@ public class EmailServiceImpl implements EmailService {
 				MimeMessage mimeMessage = mailSender.createMimeMessage();
 				MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-				InternetAddress fromAddress = new InternetAddress(emailData.getFromEmail(), emailData.getFromName());
+				InternetAddress fromAddress = new InternetAddress(fromEmail, fromName);
 				mimeMessageHelper.setFrom(fromAddress);
 				mimeMessageHelper.setTo(emailData.getReceipiants());
 				mimeMessageHelper.setSubject(emailData.getEmailSubject());
