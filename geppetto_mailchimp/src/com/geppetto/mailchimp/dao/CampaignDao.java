@@ -23,6 +23,4 @@ public interface CampaignDao {
 	public Campaign updateCampaign(Campaign campaign) throws Exception;
 
 	public boolean deleteCampaign(long campaignSno) throws Exception;
-
-	public boolean updateEmailStatus(long campaignSno, boolean emailStatus) throws Exception;
 }

@@ -42,14 +42,6 @@ public class CampaignServiceImpl implements CampaignService {
 		this.templateService = templateService;
 	}
 
-	// @Autowired
-	// private MailChimpAPIService mailChimpAPIService;
-	//
-	// public void setMailChimpAPIService(MailChimpAPIService
-	// mailChimpAPIService) {
-	// this.mailChimpAPIService = mailChimpAPIService;
-	// }
-
 	@Override
 	@Transactional
 	public ArrayList<Campaign> findAllCampaigns() throws Exception {
@@ -70,19 +62,13 @@ public class CampaignServiceImpl implements CampaignService {
 		LOG.debug("Create campaign method has been initialized in the service layer!");
 
 		if (campaign.getEmailTemplate() != null) {
-			campaign.setEmailTemplate(
-					this.templateService.createTemplate(campaign.getEmailTemplate(), campaign.getApiKey()));
+			campaign.setEmailTemplate(this.templateService.createTemplate(campaign.getEmailTemplate()));
 
 			if (campaign.getEmailTemplate().getTemplateSno() != 0L) {
-				//campaign.setCampaignId(this.mailChimpAPIService.createCampaign(campaign));
+				campaign.setCreatedDate(new Date());
+				campaign.setUpdatedDate(new Date());
 
-				//if (campaign.getCampaignId() != null && campaign.getCampaignId() != "") {
-
-					campaign.setCreatedDate(new Date());
-					campaign.setUpdatedDate(new Date());
-
-					return this.campaignDao.createCampaign(campaign);
-				//}
+				return this.campaignDao.createCampaign(campaign);
 			}
 		}
 		return null;
@@ -96,7 +82,7 @@ public class CampaignServiceImpl implements CampaignService {
 		campaign.setUpdatedDate(new Date());
 
 		if (campaign.getEmailTemplate() != null) {
-			this.templateService.updateTemplate(campaign.getEmailTemplate(), campaign.getApiKey());
+			this.templateService.updateTemplate(campaign.getEmailTemplate());
 		}
 
 		return this.campaignDao.updateCampaign(campaign);
@@ -111,21 +97,11 @@ public class CampaignServiceImpl implements CampaignService {
 
 		boolean result = false;
 		if (campaign != null) {
-			//result = this.mailChimpAPIService.deleteCampaign(campaign.getApiKey(), campaign.getCampaignId());
-			//if (result) {
-				result = this.campaignDao.deleteCampaign(campaignSno);
-				if (result) {
-					result = this.templateService.deleteTemplate(campaign.getEmailTemplate().getTemplateSno());
-				}
-			//}
+			result = this.campaignDao.deleteCampaign(campaignSno);
+			if (result) {
+				result = this.templateService.deleteTemplate(campaign.getEmailTemplate().getTemplateSno());
+			}
 		}
 		return result;
-	}
-
-	@Override
-	@Transactional
-	public boolean updateEmailStatus(long campaignSno, boolean emailStatus) throws Exception {
-		LOG.debug("Update email status method has been initialized in the service layer!");
-		return this.campaignDao.updateEmailStatus(campaignSno, emailStatus);
 	}
 }

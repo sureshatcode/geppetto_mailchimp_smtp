@@ -13,6 +13,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import com.geppetto.mailchimp.dto.EmailData;
+import com.geppetto.mailchimp.dto.Template;
 import com.geppetto.mailchimp.service.EmailService;
 import com.geppetto.mailchimp.service.TemplateService;
 
@@ -51,31 +52,22 @@ public class EmailServiceImpl implements EmailService {
 		try {
 			LOG.debug("Send SMTP email method has been initialized in the service layer!");
 
-			String sourceCode = null;
-			if (emailData.getBaseTemplateId() != 0L) {
-				sourceCode = this.templateService.findBaseTemplate(emailData.getBaseTemplateId()).getSourceCode();
-			} else if (emailData.getTemplateSno() != 0L) {
-				sourceCode = this.templateService.findTemplate(emailData.getTemplateSno()).getSourceCode();
-			}
+			if (emailData.getTemplateSno() != 0L) {
+				Template template = this.templateService.findTemplate(emailData.getTemplateSno());
 
-			if (sourceCode != null && sourceCode != "") {
+				if (template != null) {
+					MimeMessage mimeMessage = mailSender.createMimeMessage();
+					MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
-				String replacingContent = sourceCode.replace("*|BODYHEADER|*", emailData.getBodyHeader());
-				replacingContent = replacingContent.replace("*|BODYSUBJECT|*", emailData.getBodySubject());
-				replacingContent = replacingContent.replace("*|BODYCONTENT|*", emailData.getBodyContent());
-				replacingContent = replacingContent.replace("*|BODYFOOTER|*", emailData.getBodyFooter());
+					InternetAddress fromAddress = new InternetAddress(fromEmail, fromName);
+					mimeMessageHelper.setFrom(fromAddress);
+					mimeMessageHelper.setTo(emailData.getReceipiants());
+					mimeMessageHelper.setSubject(template.getEmailSubject());
+					mimeMessageHelper.setText(template.getModifiedCode(), true);
+					mailSender.send(mimeMessage);
 
-				MimeMessage mimeMessage = mailSender.createMimeMessage();
-				MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-
-				InternetAddress fromAddress = new InternetAddress(fromEmail, fromName);
-				mimeMessageHelper.setFrom(fromAddress);
-				mimeMessageHelper.setTo(emailData.getReceipiants());
-				mimeMessageHelper.setSubject(emailData.getEmailSubject());
-				mimeMessageHelper.setText(replacingContent, true);
-				mailSender.send(mimeMessage);
-
-				LOG.debug("SMTP Email was sent successfully!");
+					LOG.debug("SMTP Email was sent successfully!");
+				}
 				return true;
 			} else {
 				LOG.debug("Email template was not found!");

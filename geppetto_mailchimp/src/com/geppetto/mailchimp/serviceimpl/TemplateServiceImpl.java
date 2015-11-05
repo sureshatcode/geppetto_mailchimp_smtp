@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import com.geppetto.mailchimp.dao.TemplateDao;
 import com.geppetto.mailchimp.dto.BaseTemplate;
 import com.geppetto.mailchimp.dto.Template;
-import com.geppetto.mailchimp.service.MailChimpAPIService;
 import com.geppetto.mailchimp.service.TemplateService;
 
 /**
@@ -34,13 +33,6 @@ public class TemplateServiceImpl implements TemplateService {
 
 	public void setTemplateDao(TemplateDao templateDao) {
 		this.templateDao = templateDao;
-	}
-
-	@Autowired
-	private MailChimpAPIService mailChimpAPIService;
-
-	public void setMailChimpAPIService(MailChimpAPIService mailChimpAPIService) {
-		this.mailChimpAPIService = mailChimpAPIService;
 	}
 
 	@Override
@@ -73,7 +65,7 @@ public class TemplateServiceImpl implements TemplateService {
 
 	@Override
 	@Transactional
-	public Template createTemplate(Template template, String apiKey) throws Exception {
+	public Template createTemplate(Template template) throws Exception {
 		LOG.debug("Create template method has been initialized in the service layer!");
 
 		BaseTemplate baseTemplate = this.templateDao.findBaseTemplate(template.getBaseTemplateId());
@@ -83,14 +75,15 @@ public class TemplateServiceImpl implements TemplateService {
 		} else {
 			template.setBaseTemplateId(template.getTemplateSno());
 		}
-	
+
 		String replacingContent = template.getSourceCode().replace("*|BODYHEADER|*", template.getBodyHeader());
 		replacingContent = replacingContent.replace("*|BODYSUBJECT|*", template.getBodySubject());
 		replacingContent = replacingContent.replace("*|BODYCONTENT|*", template.getBodyContent());
 		replacingContent = replacingContent.replace("*|BODYFOOTER|*", template.getBodyFooter());
+		replacingContent = replacingContent.replace("*|APPNAME|*", template.getAppName());
+		replacingContent = replacingContent.replace("*|EMAILADDRESS|*", template.getEmailAddress());
 
 		template.setModifiedCode(replacingContent);
-		template.setExtractedCode(this.mailChimpAPIService.generateText(apiKey, "html", replacingContent));
 		template.setCreatedBy(9999);
 		template.setUpdatedBy(9999);
 		template.setCreatedDate(new Date());
@@ -100,16 +93,17 @@ public class TemplateServiceImpl implements TemplateService {
 
 	@Override
 	@Transactional
-	public Template updateTemplate(Template template, String apiKey) throws Exception {
+	public Template updateTemplate(Template template) throws Exception {
 		LOG.debug("Update template method has been initialized in the service layer!");
 
 		String replacingContent = template.getSourceCode().replace("*|BODYHEADER|*", template.getBodyHeader());
 		replacingContent = replacingContent.replace("*|BODYSUBJECT|*", template.getBodySubject());
 		replacingContent = replacingContent.replace("*|BODYCONTENT|*", template.getBodyContent());
 		replacingContent = replacingContent.replace("*|BODYFOOTER|*", template.getBodyFooter());
+		replacingContent = replacingContent.replace("*|APPNAME|*", template.getAppName());
+		replacingContent = replacingContent.replace("*|EMAILADDRESS|*", template.getEmailAddress());
 
 		template.setModifiedCode(replacingContent);
-		template.setExtractedCode(this.mailChimpAPIService.generateText(apiKey, "html", replacingContent));
 		template.setUpdatedBy(9999);
 		template.setUpdatedDate(new Date());
 

@@ -29,13 +29,15 @@ import javax.persistence.TemporalType;
 				@ColumnResult(name = "template_sno", type = Long.class),
 				@ColumnResult(name = "base_template_id", type = Long.class),
 				@ColumnResult(name = "template_name", type = String.class),
+				@ColumnResult(name = "app_name", type = String.class),
+				@ColumnResult(name = "email_address", type = String.class),
+				@ColumnResult(name = "email_subject", type = String.class),
 				@ColumnResult(name = "body_header", type = String.class),
 				@ColumnResult(name = "body_subject", type = String.class),
 				@ColumnResult(name = "body_content", type = String.class),
 				@ColumnResult(name = "body_footer", type = String.class),
 				@ColumnResult(name = "source_code", type = String.class),
 				@ColumnResult(name = "modified_code", type = String.class),
-				@ColumnResult(name = "extracted_code", type = String.class),
 				@ColumnResult(name = "created_by", type = Long.class),
 				@ColumnResult(name = "created_date", type = Date.class),
 				@ColumnResult(name = "updated_by", type = Long.class),
@@ -45,19 +47,23 @@ public class Template {
 	public Template() {
 	}
 
-	public Template(long templateSno, long baseTemplateId, String templateName, String bodyHeader, String bodySubject,
-			String bodyContent, String bodyFooter, String sourceCode, String modifiedCode, String extractedCode,
-			long createdBy, Date createdDate, long updatedBy, Date updatedDate) {
+	public Template(long templateSno, long baseTemplateId, String templateName, String appName, String emailAddress,
+			String emailSubject, String bodyHeader, String bodySubject, String bodyContent, String bodyFooter,
+			String sourceCode, String modifiedCode, long createdBy, Date createdDate, long updatedBy,
+			Date updatedDate) {
+		super();
 		this.templateSno = templateSno;
 		this.baseTemplateId = baseTemplateId;
 		this.templateName = templateName;
+		this.appName = appName;
+		this.emailAddress = emailAddress;
+		this.emailSubject = emailSubject;
 		this.bodyHeader = bodyHeader;
 		this.bodySubject = bodySubject;
 		this.bodyContent = bodyContent;
 		this.bodyFooter = bodyFooter;
 		this.sourceCode = sourceCode;
 		this.modifiedCode = modifiedCode;
-		this.extractedCode = extractedCode;
 		this.createdBy = createdBy;
 		this.createdDate = createdDate;
 		this.updatedBy = updatedBy;
@@ -74,6 +80,15 @@ public class Template {
 
 	@Column(name = "template_name")
 	private String templateName;
+
+	@Column(name = "app_name")
+	private String appName;
+
+	@Column(name = "email_address")
+	private String emailAddress;
+
+	@Column(name = "email_subject")
+	private String emailSubject;
 
 	@Column(name = "body_header", columnDefinition = "TEXT")
 	private String bodyHeader;
@@ -92,9 +107,6 @@ public class Template {
 
 	@Column(name = "modified_code", columnDefinition = "TEXT")
 	private String modifiedCode;
-
-	@Column(name = "extracted_code", columnDefinition = "TEXT")
-	private String extractedCode;
 
 	@Column(name = "created_by")
 	private long createdBy;
@@ -132,6 +144,30 @@ public class Template {
 
 	public void setTemplateName(String templateName) {
 		this.templateName = templateName;
+	}
+
+	public String getAppName() {
+		return appName;
+	}
+
+	public void setAppName(String appName) {
+		this.appName = appName;
+	}
+
+	public String getEmailAddress() {
+		return emailAddress;
+	}
+
+	public void setEmailAddress(String emailAddress) {
+		this.emailAddress = emailAddress;
+	}
+
+	public String getEmailSubject() {
+		return emailSubject;
+	}
+
+	public void setEmailSubject(String emailSubject) {
+		this.emailSubject = emailSubject;
 	}
 
 	public String getBodyHeader() {
@@ -182,14 +218,6 @@ public class Template {
 		this.modifiedCode = modifiedCode;
 	}
 
-	public String getExtractedCode() {
-		return extractedCode;
-	}
-
-	public void setExtractedCode(String extractedCode) {
-		this.extractedCode = extractedCode;
-	}
-
 	public long getCreatedBy() {
 		return createdBy;
 	}
@@ -225,9 +253,10 @@ public class Template {
 	@Override
 	public String toString() {
 		return "Template [templateSno=" + templateSno + ", baseTemplateId=" + baseTemplateId + ", templateName="
-				+ templateName + ", bodyHeader=" + bodyHeader + ", bodySubject=" + bodySubject + ", bodyContent="
+				+ templateName + ", appName=" + appName + ", emailAddress=" + emailAddress + ", emailSubject="
+				+ emailSubject + ", bodyHeader=" + bodyHeader + ", bodySubject=" + bodySubject + ", bodyContent="
 				+ bodyContent + ", bodyFooter=" + bodyFooter + ", sourceCode=" + sourceCode + ", modifiedCode="
-				+ modifiedCode + ", extractedCode=" + extractedCode + ", createdBy=" + createdBy + ", createdDate="
-				+ createdDate + ", updatedBy=" + updatedBy + ", updatedDate=" + updatedDate + "]";
+				+ modifiedCode + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", updatedBy="
+				+ updatedBy + ", updatedDate=" + updatedDate + "]";
 	}
 }

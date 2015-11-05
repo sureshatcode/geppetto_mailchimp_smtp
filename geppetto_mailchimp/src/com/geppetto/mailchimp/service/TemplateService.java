@@ -23,9 +23,9 @@ public interface TemplateService {
 
 	public Template findTemplate(long templateSno) throws Exception;
 
-	public Template createTemplate(Template template, String apiKey) throws Exception;
+	public Template createTemplate(Template template) throws Exception;
 
-	public Template updateTemplate(Template template, String apiKey) throws Exception;
+	public Template updateTemplate(Template template) throws Exception;
 
 	public boolean deleteTemplate(long templateSno) throws Exception;
 }

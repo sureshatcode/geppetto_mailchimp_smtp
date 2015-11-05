@@ -20,20 +20,10 @@ app.controller("CampaignController", [
 
 			$scope.campaign = {
 				campaignSno : "",
-				campaignId : "",
 				campaignTitle : "",
 				campaignLabel : "",
-				campaignDescription : "",
-				campaignType : "",
-				emailSubject : "",
-				fromName : "",
-				fromEmail : "",
-				toNameType : "",
-				emailType : "",
-				emailStatus : "",
+				campaignDescription : "",				
 				emailTemplate : "",
-				apiKey : "",
-				listId : "",
 				createdBy : "",
 				createdDate : "",
 				updatedBy : "",
@@ -43,6 +33,9 @@ app.controller("CampaignController", [
 			$scope.template = {
 				templateSno : "",
 				baseTemplateId : "",
+				appName : "",
+				emailAddress : "",
+				emailSubject : "",
 				templateName : "",
 				bodyHeader : "",
 				bodySubject : "",
@@ -50,7 +43,6 @@ app.controller("CampaignController", [
 				bodyFooter : "",
 				sourceCode : "",
 				modifiedCode : "",
-				extractedCode : "",
 				createdBy : "",
 				createdDate : "",
 				updatedBy : "",
@@ -185,7 +177,6 @@ app.controller("CampaignController", [
 					$scope.template.bodyFooter = "";
 					$scope.template.sourceCode = "";
 					$scope.template.modifiedCode = "";
-					$scope.template.extractedCode = "";
 				} else {
 					$("#newtemplate").attr("disabled", "disabled");
 					if ($scope.templatesList.length > 0) {
@@ -197,7 +188,6 @@ app.controller("CampaignController", [
 								$scope.template.bodyFooter = $scope.templatesList[template].bodyFooter;
 								$scope.template.sourceCode = $scope.templatesList[template].sourceCode;
 								$scope.template.modifiedCode = $scope.templatesList[template].modifiedCode;
-								$scope.template.extractedCode = $scope.templatesList[template].extractedCode;
 							}
 						}
 					}
@@ -398,7 +388,7 @@ app.controller("CampaignController", [
 					},
 				}).success(function(response) {
 					if (response != null) {
-						if (response.campaignId != null) {
+						if (response.campaignSno != null) {
 							$scope.campaign = response;
 							$scope.templatesList.push(response.emailTemplate.templateName);
 							$scope.template.templateSno = response.emailTemplate.templateSno;
@@ -503,15 +493,7 @@ app.controller("CampaignController", [
 						url : url,
 						data : {
 							receipiants : $scope.subscriberEmails,
-							fromName : $scope.campaign.fromName,
-							fromEmail : $scope.campaign.fromEmail,
-							emailSubject : $scope.campaign.emailSubject,
-							baseTemplateId : $scope.template.baseTemplateId,
-							templateSno : $scope.template.templateSno,
-							bodyHeader : $scope.template.bodyHeader,
-							bodySubject : $scope.template.bodySubject,
-							bodyFooter : $scope.template.bodyFooter,
-							bodyContent : $scope.template.bodyContent
+							templateSno : $scope.template.templateSno
 						},
 						headers : {
 							"content-type" : "application/json",
@@ -555,33 +537,25 @@ app.controller("CampaignController", [
 				$scope.findAllSubscribers();
 
 				$scope.campaign.campaignSno = CampaignData.campaign.campaignSno;
-				$scope.campaign.campaignId = CampaignData.campaign.campaignId;
 				$scope.campaign.campaignTitle = CampaignData.campaign.campaignTitle;
 				$scope.campaign.campaignLabel = CampaignData.campaign.campaignLabel;
-				$scope.campaign.campaignDescription = CampaignData.campaign.campaignDescription;
-				$scope.campaign.campaignType = CampaignData.campaign.campaignType;
-				$scope.campaign.emailSubject = CampaignData.campaign.emailSubject;
-				$scope.campaign.fromName = CampaignData.campaign.fromName;
-				$scope.campaign.fromEmail = CampaignData.campaign.fromEmail;
-				$scope.campaign.toNameType = CampaignData.campaign.toNameType;
-				$scope.campaign.emailType = CampaignData.campaign.emailType;
-				$scope.campaign.emailStatus = CampaignData.campaign.emailStatus;
+				$scope.campaign.campaignDescription = CampaignData.campaign.campaignDescription;				
 				$scope.campaign.emailTemplate = CampaignData.campaign.emailTemplate;
-				$scope.campaign.apiKey = CampaignData.campaign.apiKey;
-				$scope.campaign.listId = CampaignData.campaign.listId;
 				$scope.campaign.createdBy = CampaignData.campaign.createdBy;
 				$scope.campaign.createdDate = CampaignData.campaign.createdDate;
 				$scope.campaign.updatedBy = CampaignData.campaign.updatedBy;
 				$scope.campaign.updatedDate = CampaignData.campaign.updatedDate;
 
 				$scope.template.templateName = CampaignData.campaign.emailTemplate.templateName;
+				$scope.template.appName = CampaignData.campaign.emailTemplate.appName;
+				$scope.template.emailAddress = CampaignData.campaign.emailTemplate.emailAddress;
+				$scope.template.emailSubject = CampaignData.campaign.emailTemplate.emailSubject;
 				$scope.template.bodyHeader = CampaignData.campaign.emailTemplate.bodyHeader;
 				$scope.template.bodySubject = CampaignData.campaign.emailTemplate.bodySubject;
 				$scope.template.bodyContent = CampaignData.campaign.emailTemplate.bodyContent;
 				$scope.template.bodyFooter = CampaignData.campaign.emailTemplate.bodyFooter;
 				$scope.template.sourceCode = CampaignData.campaign.emailTemplate.sourceCode;
 				$scope.template.modifiedCode = CampaignData.campaign.emailTemplate.modifiedCode;
-				$scope.template.extractedCode = CampaignData.campaign.emailTemplate.extractedCode;
 				$scope.template.createdBy = CampaignData.campaign.emailTemplate.createdBy;
 				$scope.template.createdDate = CampaignData.campaign.emailTemplate.createdDate;
 				$scope.template.updatedBy = CampaignData.campaign.emailTemplate.updatedBy;

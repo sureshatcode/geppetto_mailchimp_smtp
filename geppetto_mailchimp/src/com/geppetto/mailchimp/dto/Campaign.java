@@ -31,24 +31,13 @@ public class Campaign {
 	public Campaign() {
 	}
 
-	public Campaign(long campaignSno, String campaignId, String campaignTitle, String campaignLabel,
-			String campaignDescription, String campaignType, String emailSubject, String fromName, String fromEmail,
-			String toNameType, String emailType, boolean emailStatus, String apiKey, String listId, long createdBy,
-			Date createdDate, long updatedBy, Date updatedDate) {
+	public Campaign(long campaignSno, String campaignTitle, String campaignLabel, String campaignDescription,
+			Template emailTemplate, long createdBy, Date createdDate, long updatedBy, Date updatedDate) {
 		this.campaignSno = campaignSno;
-		this.campaignId = campaignId;
 		this.campaignTitle = campaignTitle;
 		this.campaignLabel = campaignLabel;
 		this.campaignDescription = campaignDescription;
-		this.campaignType = campaignType;
-		this.emailSubject = emailSubject;
-		this.fromName = fromName;
-		this.fromEmail = fromEmail;
-		this.toNameType = toNameType;
-		this.emailType = emailType;
-		this.emailStatus = emailStatus;
-		this.apiKey = apiKey;
-		this.listId = listId;
+		this.emailTemplate = emailTemplate;
 		this.createdBy = createdBy;
 		this.createdDate = createdDate;
 		this.updatedBy = updatedBy;
@@ -60,9 +49,6 @@ public class Campaign {
 	@Column(name = "campaign_sno")
 	private long campaignSno;
 
-	@Column(name = "campaign_id")
-	private String campaignId;
-
 	@Column(name = "campaign_title")
 	private String campaignTitle;
 
@@ -72,36 +58,9 @@ public class Campaign {
 	@Column(name = "campaign_description")
 	private String campaignDescription;
 
-	@Column(name = "campaign_type")
-	private String campaignType;
-
-	@Column(name = "email_subject")
-	private String emailSubject;
-
-	@Column(name = "from_name")
-	private String fromName;
-
-	@Column(name = "from_email")
-	private String fromEmail;
-
-	@Column(name = "to_name_type")
-	private String toNameType;
-
-	@Column(name = "email_type")
-	private String emailType;
-
-	@Column(name = "email_status")
-	private boolean emailStatus;
-
 	@OneToOne
 	@JoinColumn(name = "template_id")
 	private Template emailTemplate;
-
-	@Column(name = "api_key")
-	private String apiKey;
-
-	@Column(name = "list_id")
-	private String listId;
 
 	@Column(name = "created_by")
 	private long createdBy;
@@ -123,14 +82,6 @@ public class Campaign {
 
 	public void setCampaignSno(long campaignSno) {
 		this.campaignSno = campaignSno;
-	}
-
-	public String getCampaignId() {
-		return campaignId;
-	}
-
-	public void setCampaignId(String campaignId) {
-		this.campaignId = campaignId;
 	}
 
 	public String getCampaignTitle() {
@@ -157,84 +108,12 @@ public class Campaign {
 		this.campaignDescription = campaignDescription;
 	}
 
-	public String getCampaignType() {
-		return campaignType;
-	}
-
-	public void setCampaignType(String campaignType) {
-		this.campaignType = campaignType;
-	}
-
-	public String getEmailSubject() {
-		return emailSubject;
-	}
-
-	public void setEmailSubject(String emailSubject) {
-		this.emailSubject = emailSubject;
-	}
-
-	public String getFromName() {
-		return fromName;
-	}
-
-	public void setFromName(String fromName) {
-		this.fromName = fromName;
-	}
-
-	public String getFromEmail() {
-		return fromEmail;
-	}
-
-	public void setFromEmail(String fromEmail) {
-		this.fromEmail = fromEmail;
-	}
-
-	public String getToNameType() {
-		return toNameType;
-	}
-
-	public void setToNameType(String toNameType) {
-		this.toNameType = toNameType;
-	}
-
-	public String getEmailType() {
-		return emailType;
-	}
-
-	public void setEmailType(String emailType) {
-		this.emailType = emailType;
-	}
-
-	public boolean isEmailStatus() {
-		return emailStatus;
-	}
-
-	public void setEmailStatus(boolean emailStatus) {
-		this.emailStatus = emailStatus;
-	}
-
 	public Template getEmailTemplate() {
 		return emailTemplate;
 	}
 
 	public void setEmailTemplate(Template emailTemplate) {
 		this.emailTemplate = emailTemplate;
-	}
-
-	public String getApiKey() {
-		return apiKey;
-	}
-
-	public void setApiKey(String apiKey) {
-		this.apiKey = apiKey;
-	}
-
-	public String getListId() {
-		return listId;
-	}
-
-	public void setListId(String listId) {
-		this.listId = listId;
 	}
 
 	public long getCreatedBy() {
@@ -271,12 +150,9 @@ public class Campaign {
 
 	@Override
 	public String toString() {
-		return "Campaign [campaignSno=" + campaignSno + ", campaignId=" + campaignId + ", campaignTitle="
-				+ campaignTitle + ", campaignLabel=" + campaignLabel + ", campaignDescription=" + campaignDescription
-				+ ", campaignType=" + campaignType + ", emailSubject=" + emailSubject + ", fromName=" + fromName
-				+ ", fromEmail=" + fromEmail + ", toNameType=" + toNameType + ", emailType=" + emailType
-				+ ", emailStatus=" + emailStatus + ", emailTemplate=" + emailTemplate + ", apiKey=" + apiKey
-				+ ", listId=" + listId + ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", updatedBy="
-				+ updatedBy + ", updatedDate=" + updatedDate + "]";
+		return "Campaign [campaignSno=" + campaignSno + ", campaignTitle=" + campaignTitle + ", campaignLabel="
+				+ campaignLabel + ", campaignDescription=" + campaignDescription + ", emailTemplate=" + emailTemplate
+				+ ", createdBy=" + createdBy + ", createdDate=" + createdDate + ", updatedBy=" + updatedBy
+				+ ", updatedDate=" + updatedDate + "]";
 	}
 }

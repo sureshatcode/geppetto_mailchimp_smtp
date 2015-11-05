@@ -49,9 +49,6 @@ public class CampaignDaoImpl implements CampaignDao {
 	@Value("${deleteCampaign}")
 	private String deleteCampaign;
 
-	@Value("${updateEmailStatus}")
-	private String updateEmailStatus;
-
 	@Value("${lastIndex}")
 	private String lastIndex;
 
@@ -108,19 +105,10 @@ public class CampaignDaoImpl implements CampaignDao {
 			LOG.debug("Create campaign method has been initialized in the dao layer!");
 
 			Query sql = entityManager.createNativeQuery(createCampaign)
-					.setParameter("campaign_id", campaign.getCampaignId())
 					.setParameter("campaign_title", campaign.getCampaignTitle())
 					.setParameter("campaign_label", campaign.getCampaignLabel())
-					.setParameter("campaign_description", campaign.getCampaignDescription())
-					.setParameter("campaign_type", campaign.getCampaignType())
-					.setParameter("email_subject", campaign.getEmailSubject())
-					.setParameter("from_name", campaign.getFromName())
-					.setParameter("from_email", campaign.getFromEmail())
-					.setParameter("to_name_type", campaign.getToNameType())
-					.setParameter("email_type", campaign.getEmailType())
-					.setParameter("email_status", campaign.isEmailStatus())
+					.setParameter("campaign_description", campaign.getCampaignDescription())					
 					.setParameter("template_id", campaign.getEmailTemplate().getTemplateSno())
-					.setParameter("api_key", campaign.getApiKey()).setParameter("list_id", campaign.getListId())
 					.setParameter("created_by", campaign.getCreatedBy())
 					.setParameter("created_date", campaign.getCreatedDate())
 					.setParameter("updated_by", campaign.getUpdatedBy())
@@ -150,19 +138,10 @@ public class CampaignDaoImpl implements CampaignDao {
 			LOG.debug("Update campaign method has been initialized in the dao layer!");
 
 			Query sql = entityManager.createNativeQuery(updateCampaign)
-					.setParameter("campaign_id", campaign.getCampaignId())
 					.setParameter("campaign_title", campaign.getCampaignTitle())
 					.setParameter("campaign_label", campaign.getCampaignLabel())
 					.setParameter("campaign_description", campaign.getCampaignDescription())
-					.setParameter("campaign_type", campaign.getCampaignType())
-					.setParameter("email_subject", campaign.getEmailSubject())
-					.setParameter("from_name", campaign.getFromName())
-					.setParameter("from_email", campaign.getFromEmail())
-					.setParameter("to_name_type", campaign.getToNameType())
-					.setParameter("email_type", campaign.getEmailType())
-					.setParameter("email_status", campaign.isEmailStatus())
 					.setParameter("template_id", campaign.getEmailTemplate().getTemplateSno())
-					.setParameter("api_key", campaign.getApiKey()).setParameter("list_id", campaign.getListId())
 					.setParameter("created_by", campaign.getCreatedBy())
 					.setParameter("created_date", campaign.getCreatedDate())
 					.setParameter("updated_by", campaign.getUpdatedBy())
@@ -193,31 +172,6 @@ public class CampaignDaoImpl implements CampaignDao {
 				return true;
 			} else {
 				LOG.debug("Campaign deletion was failed!");
-				return false;
-			}
-		} catch (Exception e) {
-			LOG.debug("Exception in dao layer: " + e.getMessage());
-		}
-		return false;
-	}
-
-	@Override
-	@Transactional
-	public boolean updateEmailStatus(long campaignSno, boolean emailStatus) throws Exception {
-		try {
-			LOG.debug("Update email status method has been initialized in the dao layer!");
-
-			Query sql = entityManager.createNativeQuery(updateEmailStatus).setParameter("email_status", emailStatus)
-					.setParameter("campaign_sno", campaignSno);
-
-			int result = sql.executeUpdate();
-
-			if (result == 1) {
-				LOG.debug("Email status was updated successfully!.  Updated email status of Campaign's ID is: "
-						+ campaignSno);
-				return true;
-			} else {
-				LOG.debug("Email status updation was failed!");
 				return false;
 			}
 		} catch (Exception e) {
